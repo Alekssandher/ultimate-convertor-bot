@@ -22,8 +22,9 @@ async def on_ready(bot, guild_id, DEV_ENV):
 
     try:
         if DEV_ENV:
-           
-            synced = await bot.tree.sync(guild=Object(id=guild_id))
+            guild = Object(id=int(guild_id))
+            
+            synced = await bot.tree.sync(guild=guild)
             logger.info(f"Synced {len(synced)} command(s) to guild {guild_id}")
         else:
             synced = await bot.tree.sync()
