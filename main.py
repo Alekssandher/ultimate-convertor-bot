@@ -10,6 +10,7 @@ config = load_config()
 TOKEN = config['TOKEN']
 GUILD_ID = config['GUILD_ID']
 DEV_ENV = config['DEV_ENV']
+
 intents = config['intents']
 
 bot = commands.Bot(command_prefix="!", intents=intents)
