@@ -70,7 +70,7 @@ async def run_ffmpeg(input_path, output_path, target_format):
 
     await loop.run_in_executor(None, ffmpeg_job)
 
-@app_commands.describe(file="The video file to convert", format="Target video format", private_response="Private response")
+@app_commands.describe(file="The video file to convert", format="Target video format", link_in_chat="See the video result in chat", private_response="Private response")
 @app_commands.choices(format=[
     app_commands.Choice(name="MP4", value="mp4"),
     app_commands.Choice(name="MOV", value="mov"),
@@ -78,7 +78,7 @@ async def run_ffmpeg(input_path, output_path, target_format):
     app_commands.Choice(name="WEBM", value="webm"),
     app_commands.Choice(name="GIF", value="gif")
 ])
-async def execute(interaction: discord.Interaction, file: discord.Attachment, format: str, private_response: bool = True):
+async def execute(interaction: discord.Interaction, file: discord.Attachment, format: str, link_in_chat: bool = False, private_response: bool = True):
     await interaction.response.defer(thinking=True, ephemeral=private_response)
 
     rtp = "video"
@@ -100,7 +100,6 @@ async def execute(interaction: discord.Interaction, file: discord.Attachment, fo
         
         await run_ffmpeg(tmp_input_path, tmp_output_path, format)
 
-        
         upload_result = uploader.upload(
                 tmp_output_path,
                 resource_type=rtp,
@@ -111,8 +110,40 @@ async def execute(interaction: discord.Interaction, file: discord.Attachment, fo
             )
         
         url = upload_result["secure_url"]
+        
+  
+        color_map = {
+            "mp4": discord.Color.blue(),
+            "mov": discord.Color.gold(),
+            "mkv": discord.Color.dark_teal(),
+            "webm": discord.Color.dark_green(),
+            "gif": discord.Color.purple(),
+        }
+        embed_color = color_map.get(format.lower(), discord.Color.green())
 
-        await interaction.followup.send(f"url: {url}")
+        embed = discord.Embed(
+            title="🎬 Video Conversion Complete!",
+            description=(
+                f"✅ **Your video was successfully converted!**\n\n"
+                f"**Original:** `{file.filename}`\n"
+                f"**Format:** `{format.upper()}`\n"
+                f"[▶️ **Watch / Download Here**]({url})"
+            ),
+            color=embed_color
+        )
+
+        embed.set_footer(text="FFmpeg Conversion • Powered by Cloudinary")
+        embed.set_thumbnail(url=url)
+
+        if format.lower() in ["mp4", "mov", "webm", "gif"]:
+            embed.set_image(url=url)
+
+        await interaction.followup.send(embed=embed, ephemeral=private_response)
+        if link_in_chat:
+            await interaction.followup.send(
+                f"🎥 **{interaction.user.mention}, here’s your converted video:**\n{url}", ephemeral=private_response
+            )
+            
     except Exception as e:
         logging.error(f"Error converting video: {e}")
         embed_error = discord.Embed(
