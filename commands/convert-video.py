@@ -12,7 +12,7 @@ import ffmpeg
 name = "convert-video"
 description = "Convert an video file to another video type"
 
-MAX_FILE_SIZE = 45 * 1024 * 1024
+MAX_FILE_SIZE = 25 * 1024 * 1024
 ALLOWED_VIDEO_TYPES = {"mp4", "webm", "avi", "mov", "mkv", "gif"}
 
 def convert_video(input_path: str, output_path: str, output_format: str):

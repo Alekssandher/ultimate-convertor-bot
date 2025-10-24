@@ -1,5 +1,5 @@
 [project]
-name = "ultimate-converter-bot"
+name = "OmniConvert"
 version = "0.1.0"
 description = "Ultimate file converter."
 authors = [
@@ -20,7 +20,6 @@ dependencies = [
     "ffmpeg-python (>=0.2.0,<0.3.0)",
     "pillow (>=12.0.0,<13.0.0)"
 ]
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

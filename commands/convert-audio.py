@@ -14,7 +14,7 @@ ALLOWED_INPUT_TYPES = {
     "mp3", "wav", "ogg", "flac", "aac", "m4a", "wma", "opus", "amr", "aiff", "aif", "mp2"
 }
 
-MAX_FILE_SIZE = 10 * 1024 * 1024
+MAX_FILE_SIZE = 25 * 1024 * 1024
 
 #@bot.tree.command(name="convert-audio", description="Convert an audio file to another audio type")
 @app_commands.describe(file="The audio file to convert", format="Target audio format", private_response="Private response")
@@ -52,7 +52,7 @@ async def execute(interaction: discord.Interaction, file: discord.Attachment, fo
 
         upload_result = uploader.upload(
             tmp_output_path,
-            resource_type="raw",
+            resource_type="video",
             folder="audio_conversions",
             use_filename=True,
             unique_filename=False,
