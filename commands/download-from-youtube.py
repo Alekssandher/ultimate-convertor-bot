@@ -15,7 +15,7 @@ MAX_FILE_SIZE = 100 * 1024 * 1024
 @app_commands.choices(format=[
     app_commands.Choice(name="MP4", value="mp4"),
     app_commands.Choice(name="MP3", value="mp3"),
-    app_commands.Choice(name="SUB", value="sub"),
+    # app_commands.Choice(name="SUB", value="sub"),
 ],
 quality=[
     app_commands.Choice(name="LOW", value="low"),
@@ -28,7 +28,6 @@ async def execute(
     url: str,
     format: str,
     quality: str,
-    subtitle_lang: str = "en",
     private_response: bool = True,
 ):
     await interaction.response.defer(thinking=True, ephemeral=private_response)
@@ -67,18 +66,18 @@ async def execute(
                 "no_warnings": True,
                 "noplaylist": True,
             }
-        elif format == "sub":
-            ydl_opts = {
-                "skip_download": True,
-                "writesubtitles": True,
-                "writeautomaticsub": True, 
-                "subtitleslangs": [subtitle_lang],
-                "convert_subtitles": "srt",
-                "outtmpl": output_path,
-                "quiet": True,
-                "no_warnings": True,
-                "noplaylist": True,
-            }
+        # elif format == "sub":
+        #     ydl_opts = {
+        #         "skip_download": True,
+        #         "writesubtitles": True,
+        #         "writeautomaticsub": True, 
+        #         "subtitleslangs": [subtitle_lang],
+        #         "convert_subtitles": "srt",
+        #         "outtmpl": output_path,
+        #         "quiet": True,
+        #         "no_warnings": True,
+        #         "noplaylist": True,
+        #     }
         else:
             await interaction.followup.send("Invalid format!", ephemeral=True)
             return
@@ -96,30 +95,30 @@ async def execute(
         try:
             info, filename = await loop.run_in_executor(None, download_youtube)
             
-            if format == "sub":
-                base_name = os.path.splitext(filename)[0]
-                subtitle_path = None
+            # if format == "sub":
+            #     base_name = os.path.splitext(filename)[0]
+            #     subtitle_path = None
 
-                for f in os.listdir(tmpdir):
-                    if f.startswith(os.path.basename(base_name)) and (f.endswith(".vtt") or f.endswith(".srt")):
-                        subtitle_path = os.path.join(tmpdir, f)
-                        break
+            #     for f in os.listdir(tmpdir):
+            #         if f.startswith(os.path.basename(base_name)) and (f.endswith(".vtt") or f.endswith(".srt")):
+            #             subtitle_path = os.path.join(tmpdir, f)
+            #             break
 
-                if not subtitle_path:
-                    ydl_opts["writeautomaticsub"] = True
-                    info, filename = await loop.run_in_executor(None, download_youtube)
-                    for f in os.listdir(tmpdir):
-                        if f.startswith(os.path.basename(base_name)) and (f.endswith(".vtt") or f.endswith(".srt")):
-                            subtitle_path = os.path.join(tmpdir, f)
-                            break
+            #     if not subtitle_path:
+            #         ydl_opts["writeautomaticsub"] = True
+            #         info, filename = await loop.run_in_executor(None, download_youtube)
+            #         for f in os.listdir(tmpdir):
+            #             if f.startswith(os.path.basename(base_name)) and (f.endswith(".vtt") or f.endswith(".srt")):
+            #                 subtitle_path = os.path.join(tmpdir, f)
+            #                 break
 
-                if not subtitle_path:
-                    await interaction.followup.send(
-                        f"No subtitles found for `{subtitle_lang}`.", ephemeral=True
-                    )
-                    return
+            #     if not subtitle_path:
+            #         await interaction.followup.send(
+            #             f"No subtitles found for `{subtitle_lang}`.", ephemeral=True
+            #         )
+            #         return
 
-                filename = subtitle_path
+            #     filename = subtitle_path
 
             file_size = os.path.getsize(filename)
             if file_size > MAX_FILE_SIZE:
